@@ -6,6 +6,8 @@ Sistema para **gestão de salas e laboratórios**, permitindo cadastrar salas, r
 
 ## Funcionalidades 
 
+| Funcionalidade | Descrição |
+|----------------|-----------|
 | **Cadastrar salas** | Inclusão de salas com nome, capacidade e tipo (Lab/Aula) |
 | **Listar salas** | Exibição de todas as salas cadastradas |
 | **Fazer reserva** | Criação de reservas com sala, responsável, data e horário (início e fim) |
@@ -23,11 +25,15 @@ Sistema para **gestão de salas e laboratórios**, permitindo cadastrar salas, r
 1. Abra o terminal na pasta raiz do projeto.
 2. Entre na pasta onde está o código:
 
+   ```bash
    cd src
+   ```
    
 3. Execute o programa:
 
+    ```bash
    python main.py
+   ```
 
 4. Escolha as opções (1 a 7 ou 0 para sair).
 
@@ -35,6 +41,7 @@ Sistema para **gestão de salas e laboratórios**, permitindo cadastrar salas, r
 
 ## Estrutura de diretórios
 
+```
 projeto_E/
 │
 ├── README.md                 # Este arquivo
@@ -48,6 +55,6 @@ projeto_E/
 └── data/                     # Dados persistidos (gerados em execução)
     ├── salas.csv             # Cadastro de salas
     └── reservas.csv          # Cadastro de reservas
+```
 
-
-
+---
