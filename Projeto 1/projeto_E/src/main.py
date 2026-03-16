@@ -14,9 +14,19 @@ def menu():
     print("0. Sair")
     return input("\nOpção: ")
 
+def _proximo_id_sala():
+    salas = repo.listar_salas()
+    ids = [int(s.id) for s in salas if str(s.id).isdigit()]
+    return str(max(ids, default=0) + 1)
+
+def _proximo_id_reserva():
+    reservas = repo.listar_reservas()
+    ids = [int(r.id) for r in reservas if str(r.id).isdigit()]
+    return str(max(ids, default=0) + 1)
+
 def cadastrar_sala():
     print("\n--- Nova Sala ---")
-    id_sala = str(len(repo.listar_salas()) + 1)
+    id_sala = _proximo_id_sala()
     nome = input("Nome da sala: ")
     cap = input("Capacidade: ")
     tipo = input("Tipo (Lab/Aula): ")
@@ -38,7 +48,7 @@ def fazer_reserva():
     for s in salas:
         print(s)
         
-    id_sala = input("Digite o ID da sala desejada: ")
+    id_sala = input("Digite o ID da sala desejada: ").strip()
     sala_selecionada = repo.buscar_sala_por_id(id_sala)
     
     if not sala_selecionada:
@@ -51,8 +61,8 @@ def fazer_reserva():
     inicio = input("Horário Início (HH:MM): ")
     fim = input("Horário Fim (HH:MM): ")
 
-    id_res = str(len(repo.listar_reservas()) + 1)
-    
+    id_res = _proximo_id_reserva()
+
     try:
         nova_reserva = Reserva(id_res, sala_selecionada, resp, data, inicio, fim)
         
@@ -117,8 +127,10 @@ def excluir_sala():
     for s in salas:
         print(s)
     
-    id_sala = input("\nDigite o ID da sala a excluir: ")
-    
+    id_sala = input("\nDigite o ID da sala a excluir: ").strip()
+    if not id_sala:
+        print("Operação cancelada.")
+        return
     if repo.excluir_sala(id_sala):
         print("Sala excluída com sucesso!")
     else:
@@ -136,8 +148,10 @@ def excluir_reserva():
         print(r)
         print()
     
-    id_reserva = input("Digite o ID da reserva a excluir: ")
-    
+    id_reserva = input("Digite o ID da reserva a excluir: ").strip()
+    if not id_reserva:
+        print("Operação cancelada.")
+        return
     if repo.excluir_reserva(id_reserva):
         print("Reserva excluída com sucesso!")
     else:
@@ -150,12 +164,20 @@ if __name__ == "__main__":
             cadastrar_sala()
         elif op == "2":
             salas = repo.listar_salas()
-            for s in salas: print(s)
+            if not salas:
+                print("\nNenhuma sala cadastrada.")
+            else:
+                for s in salas:
+                    print(s)
         elif op == "3":
             fazer_reserva()
         elif op == "4":
             reservas = repo.listar_reservas()
-            for r in reservas: print(r)
+            if not reservas:
+                print("\nNenhuma reserva cadastrada.")
+            else:
+                for r in reservas:
+                    print(r)
         elif op == "5":
             listar_reservas_filtro()
         elif op == "6":

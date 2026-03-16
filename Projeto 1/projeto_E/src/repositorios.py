@@ -1,4 +1,5 @@
 import os
+import csv
 from models import Sala, Reserva
 
 # Pasta "data" sempre na raiz do projeto (não dentro de src/)
@@ -7,26 +8,26 @@ _pasta_data = os.path.join(_raiz_projeto, "data")
 ARQUIVO_SALAS = os.path.join(_pasta_data, "salas.csv")
 ARQUIVO_RESERVAS = os.path.join(_pasta_data, "reservas.csv")
 
-# SALAS 
+# SALAS
 def salvar_sala(sala):
-    # Cria a pasta
     os.makedirs(_pasta_data, exist_ok=True)
-    with open(ARQUIVO_SALAS, 'a', encoding='utf-8') as f:
-        linha = f"{sala.id},{sala.nome},{sala.capacidade},{sala.tipo}\n"
-        f.write(linha)
+    with open(ARQUIVO_SALAS, 'a', encoding='utf-8', newline='') as f:
+        w = csv.writer(f)
+        w.writerow([sala.id, sala.nome, sala.capacidade, sala.tipo])
 
 def listar_salas():
     salas = []
     if not os.path.exists(ARQUIVO_SALAS):
         return salas
-
-    with open(ARQUIVO_SALAS, 'r', encoding='utf-8') as f:
-        for linha in f:
-            linha = linha.strip()
-            if not linha: continue
-            dados = linha.split(',')
-            s = Sala(dados[0], dados[1], dados[2], dados[3])
-            salas.append(s)
+    with open(ARQUIVO_SALAS, 'r', encoding='utf-8', newline='') as f:
+        for row in csv.reader(f):
+            if len(row) < 4:
+                continue
+            try:
+                s = Sala(row[0], row[1], row[2], row[3])
+                salas.append(s)
+            except (ValueError, IndexError):
+                continue
     return salas
 
 def buscar_sala_por_id(id_busca):
@@ -44,49 +45,43 @@ def excluir_sala(id_sala):
         return False  
     
     os.makedirs(_pasta_data, exist_ok=True)
-    with open(ARQUIVO_SALAS, 'w', encoding='utf-8') as f:
+    with open(ARQUIVO_SALAS, 'w', encoding='utf-8', newline='') as f:
+        w = csv.writer(f)
         for sala in salas_atualizadas:
-            linha = f"{sala.id},{sala.nome},{sala.capacidade},{sala.tipo}\n"
-            f.write(linha)
+            w.writerow([sala.id, sala.nome, sala.capacidade, sala.tipo])
     
     reservas = listar_reservas()
     reservas_atualizadas = [r for r in reservas if r.sala.id != id_sala]
     
-    with open(ARQUIVO_RESERVAS, 'w', encoding='utf-8') as f:
+    with open(ARQUIVO_RESERVAS, 'w', encoding='utf-8', newline='') as f:
+        w = csv.writer(f)
         for reserva in reservas_atualizadas:
-            linha = f"{reserva.id},{reserva.sala.id},{reserva.responsavel},{reserva.data},{reserva.inicio},{reserva.fim}\n"
-            f.write(linha)
+            w.writerow([reserva.id, reserva.sala.id, reserva.responsavel, reserva.data, reserva.inicio, reserva.fim])
     return True
 
-# RESERVAS 
+# RESERVAS
 def salvar_reserva(reserva):
     os.makedirs(_pasta_data, exist_ok=True)
-    with open(ARQUIVO_RESERVAS, 'a', encoding='utf-8') as f:
-        linha = f"{reserva.id},{reserva.sala.id},{reserva.responsavel},{reserva.data},{reserva.inicio},{reserva.fim}\n"
-        f.write(linha)
+    with open(ARQUIVO_RESERVAS, 'a', encoding='utf-8', newline='') as f:
+        w = csv.writer(f)
+        w.writerow([reserva.id, reserva.sala.id, reserva.responsavel, reserva.data, reserva.inicio, reserva.fim])
 
 def listar_reservas():
     reservas = []
     if not os.path.exists(ARQUIVO_RESERVAS):
         return reservas
-
-    with open(ARQUIVO_RESERVAS, 'r', encoding='utf-8') as f:
-        for linha in f:
-            linha = linha.strip()
-            if not linha: continue
-            
-            dados = linha.split(',')
-            id_res = dados[0]
-            id_sala = dados[1]
-            resp = dados[2]
-            data = dados[3]
-            ini = dados[4]
-            fim = dados[5]
+    with open(ARQUIVO_RESERVAS, 'r', encoding='utf-8', newline='') as f:
+        for row in csv.reader(f):
+            if len(row) < 6:
+                continue
+            id_res, id_sala, resp, data, ini, fim = row[0], row[1], row[2], row[3], row[4], row[5]
             sala_obj = buscar_sala_por_id(id_sala)
-        
             if sala_obj:
-                r = Reserva(id_res, sala_obj, resp, data, ini, fim)
-                reservas.append(r)
+                try:
+                    r = Reserva(id_res, sala_obj, resp, data, ini, fim)
+                    reservas.append(r)
+                except (ValueError, IndexError):
+                    continue
     return reservas
 
 def buscar_reserva_por_id(id_busca):
@@ -103,11 +98,10 @@ def excluir_reserva(id_reserva):
     if len(reservas_atualizadas) == len(reservas):
         return False 
     os.makedirs(_pasta_data, exist_ok=True)
-    with open(ARQUIVO_RESERVAS, 'w', encoding='utf-8') as f:
+    with open(ARQUIVO_RESERVAS, 'w', encoding='utf-8', newline='') as f:
+        w = csv.writer(f)
         for reserva in reservas_atualizadas:
-            linha = f"{reserva.id},{reserva.sala.id},{reserva.responsavel},{reserva.data},{reserva.inicio},{reserva.fim}\n"
-            f.write(linha)
-    
+            w.writerow([reserva.id, reserva.sala.id, reserva.responsavel, reserva.data, reserva.inicio, reserva.fim])
     return True
 
 def obter_datas_com_reservas():
